@@ -47,8 +47,8 @@ async function migrate() {
     const candidates = [
         path.join(process.cwd(), "prisma", "migrations"),
         path.join(path.dirname(process.execPath), "prisma", "migrations"),
-        path.join(__dirname, "..", "prisma", "migrations"),
-        path.join(__dirname, "../../prisma", "migrations"),
+        path.join(path.dirname(new URL(import.meta.url).pathname), "..", "prisma", "migrations"),
+        path.join(path.dirname(new URL(import.meta.url).pathname), "../../prisma", "migrations"),
     ];
     for (const candidate of candidates) {
         if (fs.existsSync(candidate)) {
