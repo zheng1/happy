@@ -6,6 +6,7 @@ on:
     paths:
       - 'packages/happy-server/**'
       - 'packages/happy-wire/**'
+      - 'Dockerfile'
       - 'Dockerfile.server'
       - '.github/workflows/docker-server.yml'
   workflow_dispatch:
@@ -25,21 +26,31 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
+      - name: Build and push server
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.server
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             registry.cn-hangzhou.aliyuncs.com/spader-public/happy-server:latest
             registry.cn-hangzhou.aliyuncs.com/spader-public/happy-server:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push standalone
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            registry.cn-hangzhou.aliyuncs.com/spader-public/happy-server:standalone-latest
+            registry.cn-hangzhou.aliyuncs.com/spader-public/happy-server:standalone-${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
